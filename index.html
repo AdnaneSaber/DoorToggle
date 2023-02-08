@@ -24,6 +24,7 @@
       const App = () => {
         const [pressed, setPressed] = React.useState(false);
         const [channel, setChannel] = React.useState(null);
+        const [countDown, setCountDown] = React.useState(5);
 
         const openDoor = () => {
           if (channel) {
@@ -48,16 +49,10 @@
               console.log('Connected to Ably channel');
               newChannel.subscribe('open', (message) => {
                 setPressed(true);
-                fetch('/light/on', {
-                  method: 'GET',
-                });
               });
 
               newChannel.subscribe('close', (message) => {
                 setPressed(false);
-                fetch('/light/off', {
-                  method: 'GET',
-                });
               });
             }
           });
@@ -70,17 +65,16 @@
         React.useEffect(() => {
           if (pressed) {
             openDoor();
-            setTimeout(() => {
-              closeDoor();
-            }, 5000);
-          }else{
-            closeDoor()
+          } else {
+            closeDoor();
           }
         }, [pressed]);
 
         return (
           <div className="w-full flex items-center justify-center py-16 flex-col gap-16">
-            {pressed ? 'Opening...' : 'Not Opening'}
+            {pressed
+              ? `Opening... and Closes in ${countDown} seconds`
+              : 'Not Opening'}
             <button
               className={
                 'rounded-full border-8 border-gray-300 p-12 ' +
